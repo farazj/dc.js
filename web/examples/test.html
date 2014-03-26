@@ -30,19 +30,16 @@
 <script type="text/javascript">
 
 var w = 500;
-var h = 100;
+var h = 600;
 var barPadding = 1;
 var chart = dc.barChart("#test");
 
-d3.csv("faraz.csv", function(error, experiments) {
+d3.csv("faraz3.csv", function(error, experiments) {
 
 	
 	//Data
 	var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
 							11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
-	//var dataset = [20130115,1000,0,2,75,2,9375,116.622721,1,0,0,0,-0.749910608,-0.743065493,
-	//		   -0.801080056,-0.937428312,0.772027822,-0.930024966,-0.837715684,-0.732968455,-0.682143961,
-	//		   -25,-125]
 
 	/* BAR CHART */
 	//Create SVG element
@@ -51,122 +48,75 @@ d3.csv("faraz.csv", function(error, experiments) {
 						.attr("width", w)
 						.attr("height", h);
 
+
 	svg.selectAll("rect")
-				.data(dataset)
+				.data(experiments)
 				.enter()
 				.append("rect")
 				.attr("x", function(d, i) {
-			   		return i * (w / dataset.length);
+			   		return i * (w / experiments.length);
 				})
 				.attr("y", function(d) {
-			   		return h - (d * 4);
+			   		return (h-(d.high-d.low)/10);
 				})
-				.attr("width", w / dataset.length - barPadding)
+				.attr("width", w / experiments.length - barPadding)
 				.attr("height", function(d) {
-			   		return d * 4;
+			   		return d.close;
 				})
-				.attr("fill", function(d) {
-				return "rgb(0," + (d*5) + "," + (d * 10) + ")";
+				.attr("fill", function(d,i) {
+				return "rgb(0," + (i*5) + "," + (i * 10) + ")";
 				});
-				
+
+			
 	// Add labels
 	svg.selectAll("text")
-			.data(dataset)
+			.data(experiments)
 			.enter()
 			.append("text")
 			.text(function(d,i){
-				return d;
+				return i;
 				})
 			.attr("x", function(d,i){
-					return i * (w/dataset.length);
+					return i * (w/experiments.length);
 				})
 			.attr("y", function(d,i){
-					return h - (d * 4) + 15
+					return (h-(d.high-d.low)/10) + 15
 				})
 			.attr("fill","white")
 		
-	/* CIRCLE CHART */
-	//Create SVG element
-	var svg = d3.select("body")
-		.append("svg")
-		.attr("width", w)
-		.attr("height", h);
 
-	var circles = svg.selectAll("circle")
-	    .data(dataset)
-	    .enter()
-	    .append("circle")
-		.attr("fill", "yellow")
-		.attr("stroke", "orange")
-		.attr("stroke-width", function(d) {
-			return d/10;});
-		
-	circles.attr("cx", function(d, i) {
-            return (i * 50) + 25;
-        })
-       .attr("cy", h/2)
-       .attr("r", function(d) {
-            return d;
-       });
 	   
 	/* SCATTERPLOT */
 	
-	var dataset = [
-                  [ 5,     20 ],
-                  [ 480,   90 ],
-                  [ 250,   50 ],
-                  [ 100,   33 ],
-                  [ 330,   95 ],
-                  [ 410,   12 ],
-                  [ 475,   44 ],
-                  [ 25,    67 ],
-                  [ 85,    21 ],
-                  [ 220,   88 ]
-              ];
 	var svg = d3.select("body")
 				.append("svg")
-				.attr("width",w)
+				.attr("width",5000)
 				.attr("height",h);
 	
 	svg.selectAll("circle")
-		.data(dataset)
+		.data(experiments)
 		.enter()
 		.append("circle")
-		.attr("cx", function(d){
-				return d[0];
+		.attr("cx", function(d,i){
+				return i*20;
 			})
 		.attr("cy", function(d){
-				return d[1];
+				return h-(d.high-d.low)/10;
 			})
-		.attr("r" , function(d){return Math.sqrt(h - d[1])})
-		.attr("fill", function(d) {
-				return "rgb(0," + (d[1]*5) + "," + (d[0]) + ")";
-				});
-
-	svg.selectAll("text")
-		.data(dataset)
-		.enter()
-		.append("text")
-		.text(function(d) {
-				return d[0] + "," + d[1];
-			})
-		 .attr("x", function(d) {
-				return d[0];
-			})
-		.attr("y", function(d) {
-				return d[1];
-			})
-		.attr("font-family", "sans-serif")
-		.attr("font-size", "11px")
-		.attr("fill", "red");
-
-
+		.attr("r" , function(d){return Math.sqrt(d.high-d.low)})
+		.attr("fill", function(d,i) {
+				return "rgb(0," + Math.abs(d.close-d.open) + "," + Math.abs(d.close-d.open) + ")";
+				})
+		.attr("stroke","rgb(0,100,100)")
+		.attr("stroke-width", function(d) {
+			return Math.sqrt(d.high-d.low)/10;});
+	
 		d3.select("body").selectAll("p")
 		.data(experiments)
 		.enter()
 		.append("p")
 		.text(function(d,i){
-				return i + "," + d.tstmp;
+				return i + "," + (d.high-d.low);
 		})
 		.style("color","red");	
 	   
